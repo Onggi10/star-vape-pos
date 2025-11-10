@@ -1,63 +1,28 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Search, ShoppingBag, Package } from "lucide-react";
+import { Search, ShoppingBag, Package, History, BarChart3 } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { Cart } from "@/components/Cart";
 import { InventoryManager } from "@/components/InventoryManager";
+import { TransactionHistory } from "@/components/TransactionHistory";
+import { Dashboard } from "@/components/Dashboard";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
+import { PaymentMethodSelector } from "@/components/PaymentMethodSelector";
 import { Receipt } from "@/components/Receipt";
-import { Product, CartItem } from "@/types/product";
+import { CartItem } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
+import { useProducts } from "@/hooks/useProducts";
+import { useTransactions } from "@/hooks/useTransactions";
 
 const Index = () => {
   const { toast } = useToast();
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: "1",
-      name: "Pod System Starter Kit",
-      price: 350000,
-      stock: 15,
-      category: "Pod Device",
-    },
-    {
-      id: "2",
-      name: "Salt Nic Liquid 30ml Mint",
-      price: 75000,
-      stock: 25,
-      category: "Liquid",
-    },
-    {
-      id: "3",
-      name: "Replacement Coil Pack",
-      price: 45000,
-      stock: 50,
-      category: "Coil",
-    },
-    {
-      id: "4",
-      name: "Premium Liquid 60ml Fruits",
-      price: 120000,
-      stock: 20,
-      category: "Liquid",
-    },
-    {
-      id: "5",
-      name: "Pod Cartridge Empty",
-      price: 35000,
-      stock: 30,
-      category: "Accessories",
-    },
-    {
-      id: "6",
-      name: "Mod Box Advanced",
-      price: 650000,
-      stock: 8,
-      category: "Mod",
-    },
-  ]);
+  const { products, loading } = useProducts();
+  const { createTransaction } = useTransactions();
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const [currentTransaction, setCurrentTransaction] = useState<{
     items: CartItem[];
@@ -71,7 +36,7 @@ const Index = () => {
       product.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: typeof products[0]) => {
     if (product.stock === 0) {
       toast({
         title: "Stok Habis",
@@ -136,70 +101,47 @@ const Index = () => {
     setCart(cart.filter((item) => item.id !== id));
   };
 
-  const handleCheckout = () => {
+  const handleCheckoutClick = () => {
     if (cart.length === 0) return;
-
-    // Update stock
-    const updatedProducts = products.map((product) => {
-      const cartItem = cart.find((item) => item.id === product.id);
-      if (cartItem) {
-        return {
-          ...product,
-          stock: product.stock - cartItem.quantity,
-        };
-      }
-      return product;
-    });
-
-    setProducts(updatedProducts);
-
-    toast({
-      title: "Transaksi Berhasil",
-      description: "Pembayaran berhasil diproses",
-    });
-
-    setCart([]);
+    setShowPaymentDialog(true);
   };
 
-  const handlePrint = () => {
+  const handlePaymentConfirm = async (paymentMethod: string) => {
     if (cart.length === 0) return;
 
-    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const transactionId = `TRX${Date.now()}`;
+    try {
+      const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const transaction = await createTransaction(cart, total, paymentMethod);
 
-    setCurrentTransaction({
-      items: cart,
-      total,
-      id: transactionId,
-    });
+      setCurrentTransaction({
+        items: cart,
+        total,
+        id: transaction.transaction_number,
+      });
 
-    setShowReceipt(true);
+      setShowReceipt(true);
+    } catch (error) {
+      console.error("Transaction error:", error);
+    }
   };
 
   const handlePrintComplete = () => {
     setShowReceipt(false);
-    handleCheckout();
+    setCart([]);
+    setCurrentTransaction(null);
   };
 
-  const handleAddProduct = (product: Omit<Product, "id">) => {
-    const newProduct: Product = {
-      ...product,
-      id: Date.now().toString(),
-    };
-    setProducts([...products, newProduct]);
-  };
-
-  const handleUpdateProduct = (id: string, updates: Partial<Product>) => {
-    setProducts(
-      products.map((product) =>
-        product.id === id ? { ...product, ...updates } : product
-      )
-    );
-  };
-
-  const handleDeleteProduct = (id: string) => {
-    setProducts(products.filter((product) => product.id !== id));
-    setCart(cart.filter((item) => item.id !== id));
+  const handleBarcodeScanned = (barcode: string) => {
+    const product = products.find((p) => p.barcode === barcode);
+    if (product) {
+      handleAddToCart(product);
+    } else {
+      toast({
+        title: "Produk Tidak Ditemukan",
+        description: `Barcode ${barcode} tidak terdaftar`,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -213,6 +155,13 @@ const Index = () => {
         />
       )}
 
+      <PaymentMethodSelector
+        isOpen={showPaymentDialog}
+        onClose={() => setShowPaymentDialog(false)}
+        onConfirm={handlePaymentConfirm}
+        total={cart.reduce((sum, item) => sum + item.price * item.quantity, 0)}
+      />
+
       <div className="container mx-auto p-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-foreground mb-2">Vape Store POS</h1>
@@ -220,7 +169,7 @@ const Index = () => {
         </div>
 
         <Tabs defaultValue="pos" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4">
             <TabsTrigger value="pos" className="flex items-center gap-2">
               <ShoppingBag className="w-4 h-4" />
               Kasir
@@ -229,30 +178,51 @@ const Index = () => {
               <Package className="w-4 h-4" />
               Inventori
             </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <History className="w-4 h-4" />
+              Riwayat
+            </TabsTrigger>
+            <TabsTrigger value="dashboard" className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              Dashboard
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="pos" className="space-y-6">
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <Input
-                    placeholder="Cari produk..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      placeholder="Cari produk..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  <BarcodeScanner onScan={handleBarcodeScanned} />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {filteredProducts.map((product) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      onAddToCart={handleAddToCart}
-                    />
-                  ))}
-                </div>
+                {loading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <div key={i} className="animate-pulse">
+                        <div className="bg-secondary rounded-lg h-64"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {filteredProducts.map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        onAddToCart={handleAddToCart}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="lg:col-span-1">
@@ -261,8 +231,7 @@ const Index = () => {
                     items={cart}
                     onUpdateQuantity={handleUpdateQuantity}
                     onRemoveItem={handleRemoveItem}
-                    onCheckout={handleCheckout}
-                    onPrint={handlePrint}
+                    onCheckout={handleCheckoutClick}
                   />
                 </div>
               </div>
@@ -270,12 +239,15 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="inventory">
-            <InventoryManager
-              products={products}
-              onAddProduct={handleAddProduct}
-              onUpdateProduct={handleUpdateProduct}
-              onDeleteProduct={handleDeleteProduct}
-            />
+            <InventoryManager />
+          </TabsContent>
+
+          <TabsContent value="history">
+            <TransactionHistory />
+          </TabsContent>
+
+          <TabsContent value="dashboard">
+            <Dashboard />
           </TabsContent>
         </Tabs>
       </div>

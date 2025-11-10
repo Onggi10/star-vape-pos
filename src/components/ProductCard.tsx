@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Package } from "lucide-react";
-import { Product } from "@/types/product";
+import { Product } from "@/hooks/useProducts";
 
 interface ProductCardProps {
   product: Product;
@@ -16,8 +16,8 @@ export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
   return (
     <Card className="overflow-hidden hover:border-primary transition-all duration-300 group">
       <div className="aspect-square bg-secondary flex items-center justify-center relative overflow-hidden">
-        {product.image ? (
-          <img src={product.image} alt={product.name} className="object-cover w-full h-full" />
+        {product.image_url ? (
+          <img src={product.image_url} alt={product.name} className="object-cover w-full h-full" />
         ) : (
           <Package className="w-16 h-16 text-muted-foreground" />
         )}

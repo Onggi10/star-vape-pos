@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Minus, Plus, Trash2, ShoppingCart, Printer } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import { CartItem } from "@/types/product";
 
 interface CartProps {
@@ -10,10 +10,9 @@ interface CartProps {
   onUpdateQuantity: (id: string, quantity: number) => void;
   onRemoveItem: (id: string) => void;
   onCheckout: () => void;
-  onPrint: () => void;
 }
 
-export const Cart = ({ items, onUpdateQuantity, onRemoveItem, onCheckout, onPrint }: CartProps) => {
+export const Cart = ({ items, onUpdateQuantity, onRemoveItem, onCheckout }: CartProps) => {
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -38,8 +37,8 @@ export const Cart = ({ items, onUpdateQuantity, onRemoveItem, onCheckout, onPrin
             items.map((item) => (
               <div key={item.id} className="flex gap-3 p-3 rounded-lg bg-secondary/50">
                 <div className="w-16 h-16 bg-background rounded flex items-center justify-center flex-shrink-0">
-                  {item.image ? (
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded" />
+              {item.image_url ? (
+                    <img src={item.image_url} alt={item.name} className="w-full h-full object-cover rounded" />
                   ) : (
                     <ShoppingCart className="w-6 h-6 text-muted-foreground" />
                   )}
@@ -96,26 +95,14 @@ export const Cart = ({ items, onUpdateQuantity, onRemoveItem, onCheckout, onPrin
             <span className="text-primary">Rp {total.toLocaleString("id-ID")}</span>
           </div>
         </div>
-        <div className="space-y-2">
-          <Button
-            className="w-full"
-            size="lg"
-            onClick={onCheckout}
-            disabled={items.length === 0}
-          >
-            Checkout
-          </Button>
-          <Button
-            className="w-full"
-            size="lg"
-            variant="outline"
-            onClick={onPrint}
-            disabled={items.length === 0}
-          >
-            <Printer className="w-4 h-4 mr-2" />
-            Cetak Struk
-          </Button>
-        </div>
+        <Button
+          className="w-full"
+          size="lg"
+          onClick={onCheckout}
+          disabled={items.length === 0}
+        >
+          Checkout
+        </Button>
       </div>
     </Card>
   );

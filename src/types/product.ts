@@ -5,6 +5,8 @@ export interface Product {
   stock: number;
   category: string;
   image?: string;
+  image_url?: string | null;
+  barcode?: string | null;
 }
 
 export interface CartItem extends Product {
