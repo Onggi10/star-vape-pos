@@ -14,7 +14,114 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          barcode: string | null
+          category: string
+          created_at: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price: number
+          stock: number
+          updated_at: string | null
+        }
+        Insert: {
+          barcode?: string | null
+          category: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price: number
+          stock?: number
+          updated_at?: string | null
+        }
+        Update: {
+          barcode?: string | null
+          category?: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number
+          stock?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      transaction_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          price: number
+          product_id: string
+          product_name: string
+          quantity: number
+          subtotal: number
+          transaction_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          price: number
+          product_id: string
+          product_name: string
+          quantity: number
+          subtotal: number
+          transaction_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          price?: number
+          product_id?: string
+          product_name?: string
+          quantity?: number
+          subtotal?: number
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaction_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_items_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          created_at: string | null
+          id: string
+          payment_method: string
+          total: number
+          transaction_number: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          payment_method: string
+          total: number
+          transaction_number: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          payment_method?: string
+          total?: number
+          transaction_number?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
