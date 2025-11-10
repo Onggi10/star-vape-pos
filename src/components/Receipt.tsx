@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { CartItem } from "@/types/product";
-import "@/styles/print.css"; // file CSS print seperti sebelumnya
+import "@/styles/print.css"; // Pastikan kamu punya file CSS ini
 
 interface ReceiptProps {
   items: CartItem[];
   total: number;
   transactionId: string;
-  paymentMethod: string; // ⬅️ Tambahkan properti baru
+  paymentMethod: string; // Metode pembayaran
   onPrintComplete: () => void;
 }
 
@@ -25,7 +25,7 @@ export const Receipt = ({
     return () => clearTimeout(timer);
   }, [onPrintComplete]);
 
-  // Fungsi bantu untuk menampilkan nama metode pembayaran
+  // Label metode pembayaran
   const getPaymentLabel = (method: string) => {
     switch (method) {
       case "cash":
@@ -45,23 +45,28 @@ export const Receipt = ({
         id="receipt-print"
         className="max-w-sm mx-auto p-8 print:p-4 bg-white text-black"
       >
-        {/* Header toko */}
+        {/* ===================== HEADER TOKO ===================== */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-foreground print:text-black">
+          {/* LOGO */}
+          <img
+            src="/images/starvape-logo.jpeg"
+            alt="Star Vape Logo"
+            className="w-20 h-20 mx-auto mb-2 object-contain"
+          />
+          <h1 className="text-xl font-bold text-foreground print:text-black tracking-wider">
             STAR VAPE
           </h1>
-          <p className="text-sm text-muted-foreground print:text-gray-600">
-            Jl. RS. Fatmawati Raya No.1, RT.1/RW.1, Pd. Labu, Kec. Cilandak,
-            Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12450
+          <p className="text-xs text-muted-foreground print:text-gray-600 leading-tight">
+            Jl. RS. Fatmawati Raya No.1, Pd. Labu, Cilandak, Jakarta Selatan
           </p>
-          <p className="text-sm text-muted-foreground print:text-gray-600">
-            0895-1446-5010
+          <p className="text-xs text-muted-foreground print:text-gray-600">
+            Telp: 0895-1446-5010
           </p>
-          <div className="border-t-2 border-dashed border-border print:border-gray-300 my-4" />
+          <div className="border-t border-dashed border-border print:border-gray-300 my-3" />
         </div>
 
-        {/* Info transaksi */}
-        <div className="mb-4 text-sm">
+        {/* ===================== INFO TRANSAKSI ===================== */}
+        <div className="mb-3 text-xs">
           <p className="text-muted-foreground print:text-gray-600">
             No. Transaksi: {transactionId}
           </p>
@@ -70,17 +75,17 @@ export const Receipt = ({
           </p>
         </div>
 
-        <div className="border-t-2 border-dashed border-border print:border-gray-300 my-4" />
+        <div className="border-t border-dashed border-border print:border-gray-300 my-3" />
 
-        {/* Daftar barang */}
-        <div className="space-y-3 mb-4">
+        {/* ===================== DAFTAR PRODUK ===================== */}
+        <div className="space-y-2 mb-4 text-sm">
           {items.map((item) => (
-            <div key={item.id} className="flex justify-between text-sm">
+            <div key={item.id} className="flex justify-between">
               <div className="flex-1">
                 <p className="font-medium text-foreground print:text-black">
                   {item.name}
                 </p>
-                <p className="text-muted-foreground print:text-gray-600">
+                <p className="text-xs text-muted-foreground print:text-gray-600">
                   {item.quantity} x Rp {item.price.toLocaleString("id-ID")}
                 </p>
               </div>
@@ -91,18 +96,18 @@ export const Receipt = ({
           ))}
         </div>
 
-        <div className="border-t-2 border-dashed border-border print:border-gray-300 my-4" />
+        <div className="border-t border-dashed border-border print:border-gray-300 my-3" />
 
-        {/* Total */}
-        <div className="flex justify-between text-lg font-bold mb-3">
+        {/* ===================== TOTAL ===================== */}
+        <div className="flex justify-between text-base font-bold mb-2">
           <span className="text-foreground print:text-black">TOTAL</span>
           <span className="text-primary print:text-black">
             Rp {total.toLocaleString("id-ID")}
           </span>
         </div>
 
-        {/* Keterangan metode pembayaran */}
-        <div className="text-sm mb-6">
+        {/* ===================== METODE PEMBAYARAN ===================== */}
+        <div className="text-xs mb-4">
           <p className="text-muted-foreground print:text-gray-600">
             Metode Pembayaran:{" "}
             <span className="font-semibold text-foreground print:text-black">
@@ -111,14 +116,13 @@ export const Receipt = ({
           </p>
         </div>
 
-        <div className="border-t-2 border-dashed border-border print:border-gray-300 my-4" />
+        <div className="border-t border-dashed border-border print:border-gray-300 my-3" />
 
-        {/* Footer */}
-        <div className="text-center text-sm text-muted-foreground print:text-gray-600">
+        {/* ===================== FOOTER ===================== */}
+        <div className="text-center text-xs text-muted-foreground print:text-gray-600 leading-tight">
           <p>Terima kasih atas kunjungan Anda!</p>
-          <p className="mt-2">
-            Barang yang sudah dibeli tidak dapat dikembalikan.
-          </p>
+          <p>Barang yang sudah dibeli tidak dapat dikembalikan.</p>
+          <p className="mt-2 font-semibold">~ STAR VAPE ~</p>
         </div>
       </div>
     </div>
