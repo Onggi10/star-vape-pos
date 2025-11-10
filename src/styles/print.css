@@ -1,0 +1,36 @@
+@media print {
+
+    /* Hanya tampilkan area struk */
+    body * {
+        visibility: hidden !important;
+    }
+
+    .print-area,
+    .print-area * {
+        visibility: visible !important;
+    }
+
+    .print-area {
+        position: absolute !important;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white !important;
+    }
+
+    /* Hilangkan background hitam/overlay dari app */
+    .bg-background {
+        background: white !important;
+    }
+
+    /* Ukuran thermal printer (opsional) */
+    @page {
+        size: 80mm auto;
+        margin: 0;
+    }
+
+    /* Hapus shadow, radius, dan elemen non-print */
+    .no-print {
+        display: none !important;
+    }
+}

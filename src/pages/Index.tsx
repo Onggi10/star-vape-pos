@@ -24,10 +24,13 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
+
+  // Simpan transaksi aktif + metode pembayaran
   const [currentTransaction, setCurrentTransaction] = useState<{
     items: CartItem[];
     total: number;
     id: string;
+    paymentMethod: string;
   } | null>(null);
 
   const filteredProducts = products.filter(
@@ -36,6 +39,7 @@ const Index = () => {
       product.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Tambah produk ke keranjang
   const handleAddToCart = (product: typeof products[0]) => {
     if (product.stock === 0) {
       toast({
@@ -47,7 +51,7 @@ const Index = () => {
     }
 
     const existingItem = cart.find((item) => item.id === product.id);
-    
+
     if (existingItem) {
       if (existingItem.quantity >= product.stock) {
         toast({
@@ -74,6 +78,7 @@ const Index = () => {
     });
   };
 
+  // Update jumlah item
   const handleUpdateQuantity = (id: string, quantity: number) => {
     if (quantity <= 0) {
       handleRemoveItem(id);
@@ -90,22 +95,21 @@ const Index = () => {
       return;
     }
 
-    setCart(
-      cart.map((item) =>
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
+    setCart(cart.map((item) => (item.id === id ? { ...item, quantity } : item)));
   };
 
+  // Hapus item dari keranjang
   const handleRemoveItem = (id: string) => {
     setCart(cart.filter((item) => item.id !== id));
   };
 
+  // Klik checkout
   const handleCheckoutClick = () => {
     if (cart.length === 0) return;
     setShowPaymentDialog(true);
   };
 
+  // Setelah metode pembayaran dipilih
   const handlePaymentConfirm = async (paymentMethod: string) => {
     if (cart.length === 0) return;
 
@@ -113,24 +117,30 @@ const Index = () => {
       const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
       const transaction = await createTransaction(cart, total, paymentMethod);
 
+      // Simpan transaksi saat ini termasuk metode pembayaran
       setCurrentTransaction({
         items: cart,
         total,
         id: transaction.transaction_number,
+        paymentMethod,
       });
 
+      // Tampilkan struk
       setShowReceipt(true);
+      setShowPaymentDialog(false);
     } catch (error) {
       console.error("Transaction error:", error);
     }
   };
 
+  // Setelah selesai print struk
   const handlePrintComplete = () => {
     setShowReceipt(false);
     setCart([]);
     setCurrentTransaction(null);
   };
 
+  // Barcode scanner
   const handleBarcodeScanned = (barcode: string) => {
     const product = products.find((p) => p.barcode === barcode);
     if (product) {
@@ -146,15 +156,18 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* ======== STRUK CETAK ======== */}
       {showReceipt && currentTransaction && (
         <Receipt
           items={currentTransaction.items}
           total={currentTransaction.total}
           transactionId={currentTransaction.id}
+          paymentMethod={currentTransaction.paymentMethod} // ⬅️ dikirim ke Receipt
           onPrintComplete={handlePrintComplete}
         />
       )}
 
+      {/* ======== PILIH METODE PEMBAYARAN ======== */}
       <PaymentMethodSelector
         isOpen={showPaymentDialog}
         onClose={() => setShowPaymentDialog(false)}
@@ -162,10 +175,13 @@ const Index = () => {
         total={cart.reduce((sum, item) => sum + item.price * item.quantity, 0)}
       />
 
+      {/* ======== KONTEN UTAMA ======== */}
       <div className="container mx-auto p-6">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Vape Store POS</h1>
-          <p className="text-muted-foreground">Sistem kasir modern untuk toko vape Anda</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Star Vape POS</h1>
+          <p className="text-muted-foreground">
+            Sistem kasir modern untuk toko vape Anda
+          </p>
         </div>
 
         <Tabs defaultValue="pos" className="space-y-6">
@@ -188,8 +204,10 @@ const Index = () => {
             </TabsTrigger>
           </TabsList>
 
+          {/* ======== TAB KASIR ======== */}
           <TabsContent value="pos" className="space-y-6">
             <div className="grid lg:grid-cols-3 gap-6">
+              {/* Katalog Produk */}
               <div className="lg:col-span-2 space-y-4">
                 <div className="flex gap-2">
                   <div className="relative flex-1">
@@ -225,6 +243,7 @@ const Index = () => {
                 )}
               </div>
 
+              {/* Keranjang Belanja */}
               <div className="lg:col-span-1">
                 <div className="sticky top-6">
                   <Cart
@@ -238,14 +257,17 @@ const Index = () => {
             </div>
           </TabsContent>
 
+          {/* ======== TAB INVENTORI ======== */}
           <TabsContent value="inventory">
             <InventoryManager />
           </TabsContent>
 
+          {/* ======== TAB RIWAYAT ======== */}
           <TabsContent value="history">
             <TransactionHistory />
           </TabsContent>
 
+          {/* ======== TAB DASHBOARD ======== */}
           <TabsContent value="dashboard">
             <Dashboard />
           </TabsContent>
