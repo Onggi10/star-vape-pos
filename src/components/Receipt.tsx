@@ -129,88 +129,82 @@ export const Receipt = ({
         </Button>
       </div>
 
-      <div className="print-area">
+      <div className="print-area flex justify-center">
         <div
           id="receipt-print"
-          className="max-w-sm mx-auto p-8 print:p-4 bg-white text-black mt-16 print:mt-0"
+          className="w-[72mm] mx-auto p-4 bg-white text-black mt-16 print:mt-0 print:p-2"
+          style={{ fontFamily: 'monospace' }}
         >
           {/* ===================== HEADER TOKO ===================== */}
-          <div className="text-center mb-6">
+          <div className="text-center mb-3">
             <img
               src="/images/starvape-logo.jpeg"
               alt="Star Vape Logo"
-              className="w-20 h-20 mx-auto mb-2 object-contain"
+              className="w-12 h-12 mx-auto mb-1 object-contain print:w-[15mm] print:h-[15mm]"
             />
-            <h1 className="text-xl font-bold text-foreground print:text-black tracking-wider">
+            <h1 className="text-base font-bold text-black tracking-wide">
               STAR VAPE
             </h1>
-            <p className="text-xs text-muted-foreground print:text-gray-600 leading-tight">
+            <p className="text-[10px] text-gray-600 leading-tight">
               Jl. RS. Fatmawati Raya No.1, Pd. Labu, Cilandak, Jakarta Selatan
             </p>
-            <p className="text-xs text-muted-foreground print:text-gray-600">
+            <p className="text-[10px] text-gray-600">
               Telp: 0895-1446-5010
             </p>
-            <div className="border-t border-dashed border-border print:border-gray-300 my-3" />
+            <div className="border-t border-dashed border-gray-400 my-2" />
           </div>
 
           {/* ===================== INFO TRANSAKSI ===================== */}
-          <div className="mb-3 text-xs">
-            <p className="text-muted-foreground print:text-gray-600">
-              No. Transaksi: {transactionId}
-            </p>
-            <p className="text-muted-foreground print:text-gray-600">
-              Tanggal: {new Date().toLocaleString("id-ID")}
+          <div className="mb-2 text-[10px]">
+            <p className="text-gray-600">No: {transactionId}</p>
+            <p className="text-gray-600">
+              {new Date().toLocaleString("id-ID")}
             </p>
           </div>
 
-          <div className="border-t border-dashed border-border print:border-gray-300 my-3" />
+          <div className="border-t border-dashed border-gray-400 my-2" />
 
           {/* ===================== DAFTAR PRODUK ===================== */}
-          <div className="space-y-2 mb-4 text-sm">
+          <div className="space-y-1 mb-2 text-[11px]">
             {items.map((item) => (
-              <div key={item.id} className="flex justify-between">
-                <div className="flex-1">
-                  <p className="font-medium text-foreground print:text-black">
-                    {item.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground print:text-gray-600">
-                    {item.quantity} x Rp {item.price.toLocaleString("id-ID")}
-                  </p>
+              <div key={item.id}>
+                <p className="font-medium text-black truncate">{item.name}</p>
+                <div className="flex justify-between text-[10px]">
+                  <span className="text-gray-600">
+                    {item.quantity} x {item.price.toLocaleString("id-ID")}
+                  </span>
+                  <span className="font-semibold text-black">
+                    {(item.price * item.quantity).toLocaleString("id-ID")}
+                  </span>
                 </div>
-                <p className="font-semibold text-foreground print:text-black">
-                  Rp {(item.price * item.quantity).toLocaleString("id-ID")}
-                </p>
               </div>
             ))}
           </div>
 
-          <div className="border-t border-dashed border-border print:border-gray-300 my-3" />
+          <div className="border-t border-dashed border-gray-400 my-2" />
 
           {/* ===================== TOTAL ===================== */}
-          <div className="flex justify-between text-base font-bold mb-2">
-            <span className="text-foreground print:text-black">TOTAL</span>
-            <span className="text-primary print:text-black">
+          <div className="flex justify-between text-sm font-bold mb-2">
+            <span className="text-black">TOTAL</span>
+            <span className="text-black">
               Rp {total.toLocaleString("id-ID")}
             </span>
           </div>
 
           {/* ===================== METODE PEMBAYARAN ===================== */}
-          <div className="text-xs mb-4">
-            <p className="text-muted-foreground print:text-gray-600">
-              Metode Pembayaran:{" "}
-              <span className="font-semibold text-foreground print:text-black">
-                {getPaymentLabel(paymentMethod)}
-              </span>
+          <div className="text-[10px] mb-2">
+            <p className="text-gray-600">
+              Bayar: <span className="font-semibold text-black">{getPaymentLabel(paymentMethod)}</span>
             </p>
           </div>
 
-          <div className="border-t border-dashed border-border print:border-gray-300 my-3" />
+          <div className="border-t border-dashed border-gray-400 my-2" />
 
           {/* ===================== FOOTER ===================== */}
-          <div className="text-center text-xs text-muted-foreground print:text-gray-600 leading-tight">
+          <div className="text-center text-[9px] text-gray-600 leading-tight">
             <p>Terima kasih atas kunjungan Anda!</p>
             <p>Barang yang sudah dibeli tidak dapat dikembalikan.</p>
-            <p className="mt-2 font-semibold">~ STAR VAPE ~</p>
+            <p className="mt-1 font-semibold">~ STAR VAPE ~</p>
           </div>
         </div>
       </div>

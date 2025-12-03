@@ -164,35 +164,37 @@ const Index = () => {
 
       <div className="container mx-auto p-6">
         {/* ======= HEADER DENGAN LOGO ======= */}
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
           <img
             src="/images/starvape-logo.jpeg"
             alt="Star Vape Logo"
-            className="w-32 h-32 mb-3 rounded-full shadow-md object-contain"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full shadow-md object-contain"
           />
-          <h1 className="text-3xl font-bold text-foreground mb-1">Star Vape POS</h1>
-          <p className="text-muted-foreground">
-            Sistem kasir modern untuk toko vape Anda
-          </p>
+          <div className="text-center sm:text-left">
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Star Vape POS</h1>
+            <p className="text-sm text-muted-foreground">
+              Sistem kasir modern untuk toko vape Anda
+            </p>
+          </div>
         </div>
 
-        <Tabs defaultValue="pos" className="space-y-6">
-          <TabsList className="grid w-full max-w-2xl grid-cols-4">
-            <TabsTrigger value="pos" className="flex items-center gap-2">
+        <Tabs defaultValue="pos" className="space-y-4 sm:space-y-6">
+          <TabsList className="grid w-full grid-cols-4 h-auto p-1">
+            <TabsTrigger value="pos" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
               <ShoppingBag className="w-4 h-4" />
-              Kasir
+              <span className="hidden xs:inline sm:inline">Kasir</span>
             </TabsTrigger>
-            <TabsTrigger value="inventory" className="flex items-center gap-2">
+            <TabsTrigger value="inventory" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
               <Package className="w-4 h-4" />
-              Inventori
+              <span className="hidden xs:inline sm:inline">Inventori</span>
             </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2">
+            <TabsTrigger value="history" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
               <History className="w-4 h-4" />
-              Riwayat
+              <span className="hidden xs:inline sm:inline">Riwayat</span>
             </TabsTrigger>
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
+            <TabsTrigger value="dashboard" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
               <BarChart3 className="w-4 h-4" />
-              Dashboard
+              <span className="hidden xs:inline sm:inline">Dashboard</span>
             </TabsTrigger>
           </TabsList>
 
