@@ -17,11 +17,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { History, Receipt, CalendarIcon, X } from "lucide-react";
+import { History, Receipt, CalendarIcon, X, FileSpreadsheet, FileText } from "lucide-react";
 import { useTransactions, Transaction } from "@/hooks/useTransactions";
 import { format, isSameDay, isSameMonth, isSameYear } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { toast } from "sonner";
 
 type FilterMode = "all" | "date" | "month" | "year";
 
@@ -87,6 +91,87 @@ export const TransactionHistory = () => {
     setSelectedDate(undefined);
     setSelectedMonth("");
     setSelectedYear("");
+  };
+
+  const getFilterLabel = () => {
+    if (filterMode === "date" && selectedDate) {
+      return format(selectedDate, "dd MMMM yyyy", { locale: idLocale });
+    }
+    if (filterMode === "month" && selectedMonth && selectedYear) {
+      const monthName = months.find(m => m.value === selectedMonth)?.label;
+      return `${monthName} ${selectedYear}`;
+    }
+    if (filterMode === "year" && selectedYear) {
+      return `Tahun ${selectedYear}`;
+    }
+    return "Semua Periode";
+  };
+
+  const exportToExcel = () => {
+    if (filteredTransactions.length === 0) {
+      toast.error("Tidak ada data untuk di-export");
+      return;
+    }
+
+    const data = filteredTransactions.flatMap((t) =>
+      t.items?.map((item) => ({
+        "No Transaksi": t.transaction_number,
+        Tanggal: format(new Date(t.created_at), "dd/MM/yyyy HH:mm:ss"),
+        "Nama Produk": item.product_name,
+        Qty: item.quantity,
+        Harga: item.price,
+        Subtotal: item.subtotal,
+        "Metode Bayar": t.payment_method.toUpperCase(),
+        "Total Transaksi": Number(t.total),
+      })) || []
+    );
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Transaksi");
+    
+    const fileName = `Transaksi_${getFilterLabel().replace(/\s/g, "_")}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    toast.success("Berhasil export ke Excel");
+  };
+
+  const exportToPDF = () => {
+    if (filteredTransactions.length === 0) {
+      toast.error("Tidak ada data untuk di-export");
+      return;
+    }
+
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(16);
+    doc.text("Laporan Transaksi", 14, 15);
+    doc.setFontSize(10);
+    doc.text(`Periode: ${getFilterLabel()}`, 14, 22);
+    doc.text(`Total: Rp ${totalFiltered.toLocaleString("id-ID")}`, 14, 28);
+
+    const tableData = filteredTransactions.flatMap((t) =>
+      t.items?.map((item) => [
+        t.transaction_number,
+        format(new Date(t.created_at), "dd/MM/yy HH:mm"),
+        item.product_name,
+        item.quantity.toString(),
+        `Rp ${item.subtotal.toLocaleString("id-ID")}`,
+        t.payment_method.toUpperCase(),
+      ]) || []
+    );
+
+    autoTable(doc, {
+      head: [["No. Trx", "Tanggal", "Produk", "Qty", "Subtotal", "Bayar"]],
+      body: tableData,
+      startY: 35,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [59, 130, 246] },
+    });
+
+    const fileName = `Transaksi_${getFilterLabel().replace(/\s/g, "_")}.pdf`;
+    doc.save(fileName);
+    toast.success("Berhasil export ke PDF");
   };
 
   const getPaymentMethodBadge = (method: string) => {
@@ -248,6 +333,30 @@ export const TransactionHistory = () => {
             </Button>
           )}
         </div>
+      </div>
+
+      {/* Export Buttons */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={exportToExcel}
+          className="gap-2"
+        >
+          <FileSpreadsheet className="h-4 w-4" />
+          <span className="hidden sm:inline">Export Excel</span>
+          <span className="sm:hidden">Excel</span>
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={exportToPDF}
+          className="gap-2"
+        >
+          <FileText className="h-4 w-4" />
+          <span className="hidden sm:inline">Export PDF</span>
+          <span className="sm:hidden">PDF</span>
+        </Button>
       </div>
 
       {/* Total Summary */}
