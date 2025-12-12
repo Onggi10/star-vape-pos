@@ -56,89 +56,90 @@ export const Dashboard = () => {
   const COLORS = ["hsl(var(--primary))", "hsl(var(--secondary))", "hsl(var(--accent))", "#8884d8", "#82ca9d"];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary/10 rounded-lg">
-              <DollarSign className="w-6 h-6 text-primary" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+        <Card className="p-3 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+            <div className="p-2 sm:p-3 bg-primary/10 rounded-lg">
+              <DollarSign className="w-4 h-4 sm:w-6 sm:h-6 text-primary" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Revenue</p>
-              <p className="text-2xl font-bold text-foreground">
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Total Revenue</p>
+              <p className="text-sm sm:text-2xl font-bold text-foreground">
                 Rp {totalRevenue.toLocaleString("id-ID")}
               </p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-accent/10 rounded-lg">
-              <ShoppingCart className="w-6 h-6 text-accent" />
+        <Card className="p-3 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+            <div className="p-2 sm:p-3 bg-accent/10 rounded-lg">
+              <ShoppingCart className="w-4 h-4 sm:w-6 sm:h-6 text-accent" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Transaksi</p>
-              <p className="text-2xl font-bold text-foreground">{totalTransactions}</p>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Total Transaksi</p>
+              <p className="text-sm sm:text-2xl font-bold text-foreground">{totalTransactions}</p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-secondary/50 rounded-lg">
-              <Package className="w-6 h-6 text-secondary-foreground" />
+        <Card className="p-3 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+            <div className="p-2 sm:p-3 bg-secondary/50 rounded-lg">
+              <Package className="w-4 h-4 sm:w-6 sm:h-6 text-secondary-foreground" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Produk</p>
-              <p className="text-2xl font-bold text-foreground">{products.length}</p>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Total Produk</p>
+              <p className="text-sm sm:text-2xl font-bold text-foreground">{products.length}</p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-destructive/10 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-destructive" />
+        <Card className="p-3 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+            <div className="p-2 sm:p-3 bg-destructive/10 rounded-lg">
+              <TrendingUp className="w-4 h-4 sm:w-6 sm:h-6 text-destructive" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Stok Rendah</p>
-              <p className="text-2xl font-bold text-foreground">{lowStockProducts}</p>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Stok Rendah</p>
+              <p className="text-sm sm:text-2xl font-bold text-foreground">{lowStockProducts}</p>
             </div>
           </div>
         </Card>
       </div>
 
       {/* Charts */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">
+      <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
+        <Card className="p-3 sm:p-6">
+          <h3 className="text-sm sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">
             Penjualan Bulan Ini
           </h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={200} className="sm:h-[300px]">
             <BarChart data={dailySales}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" />
-              <YAxis stroke="hsl(var(--muted-foreground))" />
+              <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 10 }} />
+              <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 10 }} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "hsl(var(--card))",
                   border: "1px solid hsl(var(--border))",
                   borderRadius: "8px",
+                  fontSize: "12px",
                 }}
               />
-              <Bar dataKey="total" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Card>
 
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">
+        <Card className="p-3 sm:p-6">
+          <h3 className="text-sm sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">
             Produk Terlaris
           </h3>
           {topProducts.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={200} className="sm:h-[300px]">
               <PieChart>
                 <Pie
                   data={topProducts}
@@ -146,8 +147,9 @@ export const Dashboard = () => {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  outerRadius={100}
-                  label={(entry) => entry.name}
+                  outerRadius={60}
+                  label={({ name }) => name.length > 10 ? name.substring(0, 10) + "..." : name}
+                  labelLine={false}
                 >
                   {topProducts.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -158,13 +160,14 @@ export const Dashboard = () => {
                     backgroundColor: "hsl(var(--card))",
                     border: "1px solid hsl(var(--border))",
                     borderRadius: "8px",
+                    fontSize: "12px",
                   }}
                   formatter={(value: any) => `Rp ${Number(value).toLocaleString("id-ID")}`}
                 />
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+            <div className="flex items-center justify-center h-[200px] sm:h-[300px] text-muted-foreground text-sm">
               Belum ada data penjualan
             </div>
           )}
@@ -172,26 +175,30 @@ export const Dashboard = () => {
       </div>
 
       {/* Top Products Table */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Top 5 Produk</h3>
-        <div className="space-y-3">
-          {topProducts.map((product, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-3 bg-secondary/30 rounded-lg"
-            >
-              <div className="flex items-center gap-3">
-                <span className="font-bold text-primary text-lg">#{index + 1}</span>
-                <div>
-                  <p className="font-medium text-foreground">{product.name}</p>
-                  <p className="text-sm text-muted-foreground">{product.quantity} terjual</p>
+      <Card className="p-3 sm:p-6">
+        <h3 className="text-sm sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Top 5 Produk</h3>
+        <div className="space-y-2 sm:space-y-3">
+          {topProducts.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">Belum ada data penjualan</p>
+          ) : (
+            topProducts.map((product, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-2 sm:p-3 bg-secondary/30 rounded-lg"
+              >
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                  <span className="font-bold text-primary text-sm sm:text-lg">#{index + 1}</span>
+                  <div className="min-w-0">
+                    <p className="font-medium text-foreground text-xs sm:text-base truncate">{product.name}</p>
+                    <p className="text-[10px] sm:text-sm text-muted-foreground">{product.quantity} terjual</p>
+                  </div>
                 </div>
+                <p className="font-semibold text-primary text-xs sm:text-base flex-shrink-0">
+                  Rp {product.total.toLocaleString("id-ID")}
+                </p>
               </div>
-              <p className="font-semibold text-primary">
-                Rp {product.total.toLocaleString("id-ID")}
-              </p>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </Card>
     </div>

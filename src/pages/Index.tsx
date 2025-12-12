@@ -202,28 +202,38 @@ const Index = () => {
         </div>
 
         <Tabs defaultValue="pos" className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-4 h-auto p-1">
-            <TabsTrigger value="pos" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
-              <ShoppingBag className="w-4 h-4" />
-              <span className="hidden xs:inline sm:inline">Kasir</span>
+          <TabsList className="grid w-full grid-cols-4 h-auto p-1 gap-1">
+            <TabsTrigger value="pos" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
+              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>Kasir</span>
             </TabsTrigger>
-            <TabsTrigger value="inventory" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
-              <Package className="w-4 h-4" />
-              <span className="hidden xs:inline sm:inline">Inventori</span>
+            <TabsTrigger value="inventory" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
+              <Package className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>Stok</span>
             </TabsTrigger>
-            <TabsTrigger value="history" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
-              <History className="w-4 h-4" />
-              <span className="hidden xs:inline sm:inline">Riwayat</span>
+            <TabsTrigger value="history" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
+              <History className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>Riwayat</span>
             </TabsTrigger>
-            <TabsTrigger value="dashboard" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
-              <BarChart3 className="w-4 h-4" />
-              <span className="hidden xs:inline sm:inline">Dashboard</span>
+            <TabsTrigger value="dashboard" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
+              <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>Dashboard</span>
             </TabsTrigger>
           </TabsList>
 
           {/* TAB POS */}
-          <TabsContent value="pos" className="space-y-6">
-            <div className="grid lg:grid-cols-3 gap-6">
+          <TabsContent value="pos" className="space-y-4 sm:space-y-6">
+            <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-6">
+              {/* Cart - Mobile: Tampil di atas */}
+              <div className="lg:hidden">
+                <Cart
+                  items={cart}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  onRemoveItem={handleRemoveItem}
+                  onCheckout={handleCheckoutClick}
+                />
+              </div>
+
               <div className="lg:col-span-2 space-y-4">
                 <div className="flex gap-2">
                   <div className="relative flex-1">
@@ -239,15 +249,15 @@ const Index = () => {
                 </div>
 
                 {loading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-2 sm:gap-4">
                     {[1, 2, 3, 4, 5, 6].map((i) => (
                       <div key={i} className="animate-pulse">
-                        <div className="bg-secondary rounded-lg h-64"></div>
+                        <div className="bg-secondary rounded-lg h-48 sm:h-64"></div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-2 sm:gap-4">
                     {filteredProducts.map((product) => (
                       <ProductCard
                         key={product.id}
@@ -259,7 +269,8 @@ const Index = () => {
                 )}
               </div>
 
-              <div className="lg:col-span-1">
+              {/* Cart - Desktop: Tampil di samping */}
+              <div className="hidden lg:block lg:col-span-1">
                 <div className="sticky top-6">
                   <Cart
                     items={cart}
