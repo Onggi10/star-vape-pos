@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { CartItem } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Printer, Bluetooth, X } from "lucide-react";
-import { useThermalPrinter } from "@/hooks/useThermalPrinter";
+import { useThermalPrinterContext } from "@/contexts/ThermalPrinterContext";
 import { useToast } from "@/hooks/use-toast";
 import "@/styles/print.css";
 
@@ -29,7 +29,7 @@ export const Receipt = ({
     connect,
     disconnect,
     printReceipt,
-  } = useThermalPrinter();
+  } = useThermalPrinterContext();
 
   const [isPrinting, setIsPrinting] = useState(false);
 
