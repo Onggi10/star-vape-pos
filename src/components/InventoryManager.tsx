@@ -112,34 +112,34 @@ export const InventoryManager = () => {
   };
 
   return (
-    <Card className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <Card className="p-3 sm:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-6">
         <div className="flex items-center gap-2">
-          <Package className="w-5 h-5 text-primary" />
-          <h2 className="text-xl font-bold text-foreground">Manajemen Stok</h2>
+          <Package className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+          <h2 className="text-base sm:text-xl font-bold text-foreground">Manajemen Stok</h2>
         </div>
         <Dialog open={isOpen} onOpenChange={(open) => {
           setIsOpen(open);
           if (!open) resetForm();
         }}>
           <DialogTrigger asChild>
-            <Button>
+            <Button size="sm" className="w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               Tambah Produk
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>
+              <DialogTitle className="text-base sm:text-lg">
                 {editingProduct ? "Edit Produk" : "Tambah Produk Baru"}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
               <div>
-                <Label htmlFor="image">Gambar Produk</Label>
+                <Label htmlFor="image" className="text-xs sm:text-sm">Gambar Produk</Label>
                 <div className="mt-2">
                   {imagePreview ? (
-                    <div className="relative w-full h-48 bg-secondary rounded-lg overflow-hidden">
+                    <div className="relative w-full h-32 sm:h-48 bg-secondary rounded-lg overflow-hidden">
                       <img
                         src={imagePreview}
                         alt="Preview"
@@ -159,13 +159,13 @@ export const InventoryManager = () => {
                       </Button>
                     </div>
                   ) : (
-                    <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-secondary/50 transition-colors">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Upload className="w-10 h-10 text-muted-foreground mb-3" />
-                        <p className="text-sm text-muted-foreground">
-                          <span className="font-semibold">Klik untuk upload</span> atau drag and drop
+                    <label className="flex flex-col items-center justify-center w-full h-32 sm:h-48 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-secondary/50 transition-colors">
+                      <div className="flex flex-col items-center justify-center p-4">
+                        <Upload className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground mb-2" />
+                        <p className="text-xs sm:text-sm text-muted-foreground text-center">
+                          <span className="font-semibold">Klik untuk upload</span>
                         </p>
-                        <p className="text-xs text-muted-foreground mt-1">PNG, JPG (MAX. 2MB)</p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">PNG, JPG (MAX. 2MB)</p>
                       </div>
                       <input
                         type="file"
@@ -178,50 +178,57 @@ export const InventoryManager = () => {
                 </div>
               </div>
               <div>
-                <Label htmlFor="name">Nama Produk</Label>
+                <Label htmlFor="name" className="text-xs sm:text-sm">Nama Produk</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Contoh: Pod Liquid Mint"
+                  className="text-sm"
                 />
               </div>
               <div>
-                <Label htmlFor="category">Kategori</Label>
+                <Label htmlFor="category" className="text-xs sm:text-sm">Kategori</Label>
                 <Input
                   id="category"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   placeholder="Contoh: Pod, Liquid, Coil"
+                  className="text-sm"
                 />
               </div>
-              <div>
-                <Label htmlFor="price">Harga (Rp)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  placeholder="50000"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="price" className="text-xs sm:text-sm">Harga (Rp)</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    placeholder="50000"
+                    className="text-sm"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="stock" className="text-xs sm:text-sm">Stok</Label>
+                  <Input
+                    id="stock"
+                    type="number"
+                    value={formData.stock}
+                    onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                    placeholder="10"
+                    className="text-sm"
+                  />
+                </div>
               </div>
               <div>
-                <Label htmlFor="stock">Stok</Label>
-                <Input
-                  id="stock"
-                  type="number"
-                  value={formData.stock}
-                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                  placeholder="10"
-                />
-              </div>
-              <div>
-                <Label htmlFor="barcode">Barcode (Opsional)</Label>
+                <Label htmlFor="barcode" className="text-xs sm:text-sm">Barcode (Opsional)</Label>
                 <Input
                   id="barcode"
                   value={formData.barcode}
                   onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
                   placeholder="1234567890"
+                  className="text-sm"
                 />
               </div>
               <Button type="submit" className="w-full" disabled={uploading}>
@@ -232,17 +239,76 @@ export const InventoryManager = () => {
         </Dialog>
       </div>
 
-      <div className="rounded-md border border-border">
+      {/* Mobile: Card View */}
+      <div className="block sm:hidden space-y-3">
+        {products.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <Package className="w-12 h-12 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">Belum ada produk</p>
+          </div>
+        ) : (
+          products.map((product) => (
+            <Card key={product.id} className="p-3">
+              <div className="flex gap-3">
+                <div className="w-16 h-16 bg-secondary rounded overflow-hidden flex items-center justify-center flex-shrink-0">
+                  {product.image_url ? (
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <ImageIcon className="w-6 h-6 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-sm truncate">{product.name}</h3>
+                  <p className="text-xs text-muted-foreground">{product.category}</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-sm font-bold text-primary">
+                      Rp {product.price.toLocaleString("id-ID")}
+                    </p>
+                    <span className={`text-xs ${product.stock < 5 ? "text-destructive font-semibold" : "text-muted-foreground"}`}>
+                      Stok: {product.stock}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8"
+                    onClick={() => handleEdit(product)}
+                  >
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 text-destructive hover:text-destructive"
+                    onClick={() => handleDelete(product.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))
+        )}
+      </div>
+
+      {/* Desktop: Table View */}
+      <div className="hidden sm:block rounded-md border border-border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Gambar</TableHead>
+              <TableHead className="w-16">Gambar</TableHead>
               <TableHead>Nama Produk</TableHead>
               <TableHead>Kategori</TableHead>
               <TableHead className="text-right">Harga</TableHead>
               <TableHead className="text-right">Stok</TableHead>
               <TableHead>Barcode</TableHead>
-              <TableHead className="text-right">Aksi</TableHead>
+              <TableHead className="text-right w-24">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

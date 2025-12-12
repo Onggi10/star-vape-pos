@@ -19,38 +19,38 @@ export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
         {product.image_url ? (
           <img src={product.image_url} alt={product.name} className="object-cover w-full h-full" />
         ) : (
-          <Package className="w-16 h-16 text-muted-foreground" />
+          <Package className="w-10 h-10 sm:w-16 sm:h-16 text-muted-foreground" />
         )}
         {isLowStock && !isOutOfStock && (
-          <Badge variant="destructive" className="absolute top-2 right-2">
+          <Badge variant="destructive" className="absolute top-1 right-1 sm:top-2 sm:right-2 text-[10px] sm:text-xs px-1.5 sm:px-2">
             Stok Rendah
           </Badge>
         )}
         {isOutOfStock && (
-          <Badge variant="destructive" className="absolute top-2 right-2">
+          <Badge variant="destructive" className="absolute top-1 right-1 sm:top-2 sm:right-2 text-[10px] sm:text-xs px-1.5 sm:px-2">
             Habis
           </Badge>
         )}
       </div>
-      <div className="p-4">
-        <div className="mb-2">
-          <h3 className="font-semibold text-foreground truncate">{product.name}</h3>
-          <p className="text-sm text-muted-foreground">{product.category}</p>
+      <div className="p-2 sm:p-4">
+        <div className="mb-1 sm:mb-2">
+          <h3 className="font-semibold text-foreground truncate text-xs sm:text-base">{product.name}</h3>
+          <p className="text-[10px] sm:text-sm text-muted-foreground truncate">{product.category}</p>
         </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xl font-bold text-primary">
+        <div className="flex items-center justify-between gap-1">
+          <div className="min-w-0 flex-1">
+            <p className="text-sm sm:text-xl font-bold text-primary truncate">
               Rp {product.price.toLocaleString("id-ID")}
             </p>
-            <p className="text-xs text-muted-foreground">Stok: {product.stock}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Stok: {product.stock}</p>
           </div>
           <Button
             size="icon"
             onClick={() => onAddToCart(product)}
             disabled={isOutOfStock}
-            className="group-hover:scale-110 transition-transform"
+            className="group-hover:scale-110 transition-transform h-7 w-7 sm:h-10 sm:w-10 flex-shrink-0"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
           </Button>
         </div>
       </div>
