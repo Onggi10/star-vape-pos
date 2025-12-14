@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
-import { Wallet, CreditCard, Smartphone, Building2, ArrowLeft, Calculator } from "lucide-react";
+import { Wallet, CreditCard, Smartphone, Building2, ArrowLeft, Calculator, CheckCircle2 } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 
 interface PaymentMethodSelectorProps {
   isOpen: boolean;
@@ -27,6 +28,10 @@ const banks = [
 
 const quickAmounts = [10000, 20000, 50000, 100000, 200000, 500000];
 
+// QRIS merchant info - ganti dengan data QRIS asli Anda
+const QRIS_MERCHANT_NAME = "STAR VAPE";
+const QRIS_MERCHANT_ID = "ID1234567890123";
+
 export const PaymentMethodSelector = ({
   isOpen,
   onClose,
@@ -34,7 +39,7 @@ export const PaymentMethodSelector = ({
   total,
 }: PaymentMethodSelectorProps) => {
   const [selectedMethod, setSelectedMethod] = useState("cash");
-  const [step, setStep] = useState<"method" | "cash" | "transfer">("method");
+  const [step, setStep] = useState<"method" | "cash" | "transfer" | "qris">("method");
   const [cashReceived, setCashReceived] = useState<number>(0);
   const [selectedBank, setSelectedBank] = useState("bca");
 
@@ -46,6 +51,12 @@ export const PaymentMethodSelector = ({
 
   const change = cashReceived - total;
 
+  // Generate QRIS data string (simplified format)
+  const generateQrisData = () => {
+    const timestamp = Date.now();
+    return `00020101021126${QRIS_MERCHANT_ID}5204599953033605802ID5913${QRIS_MERCHANT_NAME}6007JAKARTA61051234062${timestamp}${total.toString().padStart(10, '0')}6304`;
+  };
+
   const handleMethodSelect = (method: string) => {
     setSelectedMethod(method);
     if (method === "cash") {
@@ -53,6 +64,8 @@ export const PaymentMethodSelector = ({
       setStep("cash");
     } else if (method === "transfer") {
       setStep("transfer");
+    } else if (method === "qris") {
+      setStep("qris");
     }
   };
 
@@ -101,6 +114,7 @@ export const PaymentMethodSelector = ({
             {step === "method" && "Pilih Metode Pembayaran"}
             {step === "cash" && "Pembayaran Cash"}
             {step === "transfer" && "Transfer Bank"}
+            {step === "qris" && "Pembayaran QRIS"}
           </DialogTitle>
         </DialogHeader>
 
@@ -115,37 +129,86 @@ export const PaymentMethodSelector = ({
 
           {/* Step: Method Selection */}
           {step === "method" && (
-            <>
-              <RadioGroup value={selectedMethod} onValueChange={handleMethodSelect}>
-                <div className="space-y-3">
-                  {paymentMethods.map((method) => {
-                    const Icon = method.icon;
-                    return (
-                      <div
-                        key={method.value}
-                        className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-secondary/50 cursor-pointer transition-colors"
-                        onClick={() => handleMethodSelect(method.value)}
+            <RadioGroup value={selectedMethod} onValueChange={handleMethodSelect}>
+              <div className="space-y-3">
+                {paymentMethods.map((method) => {
+                  const Icon = method.icon;
+                  return (
+                    <div
+                      key={method.value}
+                      className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-secondary/50 cursor-pointer transition-colors"
+                      onClick={() => handleMethodSelect(method.value)}
+                    >
+                      <RadioGroupItem value={method.value} id={method.value} />
+                      <Label
+                        htmlFor={method.value}
+                        className="flex items-center gap-3 cursor-pointer flex-1"
                       >
-                        <RadioGroupItem value={method.value} id={method.value} />
-                        <Label
-                          htmlFor={method.value}
-                          className="flex items-center gap-3 cursor-pointer flex-1"
-                        >
-                          <Icon className="w-5 h-5 text-primary" />
-                          <span className="font-medium">{method.label}</span>
-                        </Label>
-                      </div>
-                    );
-                  })}
-                </div>
-              </RadioGroup>
+                        <Icon className="w-5 h-5 text-primary" />
+                        <span className="font-medium">{method.label}</span>
+                      </Label>
+                    </div>
+                  );
+                })}
+              </div>
+            </RadioGroup>
+          )}
 
-              {selectedMethod === "qris" && (
-                <Button onClick={handleConfirm} className="w-full" size="lg">
-                  Konfirmasi Pembayaran QRIS
-                </Button>
-              )}
-            </>
+          {/* Step: QRIS Payment */}
+          {step === "qris" && (
+            <div className="space-y-4">
+              {/* QR Code Display */}
+              <div className="flex flex-col items-center gap-4">
+                <div className="bg-white p-4 rounded-xl shadow-lg">
+                  <QRCodeSVG
+                    value={generateQrisData()}
+                    size={200}
+                    level="H"
+                    includeMargin={true}
+                    bgColor="#ffffff"
+                    fgColor="#000000"
+                  />
+                </div>
+                
+                <div className="text-center space-y-1">
+                  <p className="font-bold text-lg">{QRIS_MERCHANT_NAME}</p>
+                  <p className="text-xs text-muted-foreground">ID: {QRIS_MERCHANT_ID}</p>
+                </div>
+              </div>
+
+              {/* Instructions */}
+              <div className="p-4 bg-muted rounded-lg space-y-2">
+                <p className="text-sm font-medium text-center">Cara Pembayaran:</p>
+                <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
+                  <li>Buka aplikasi e-wallet atau m-banking</li>
+                  <li>Pilih menu Scan QR / QRIS</li>
+                  <li>Scan QR Code di atas</li>
+                  <li>Periksa nominal dan konfirmasi pembayaran</li>
+                  <li>Tunjukkan bukti pembayaran ke kasir</li>
+                </ol>
+              </div>
+
+              {/* Supported Apps */}
+              <div className="flex flex-wrap justify-center gap-2">
+                {["GoPay", "OVO", "DANA", "ShopeePay", "LinkAja", "BCA", "BRI", "Mandiri"].map((app) => (
+                  <span
+                    key={app}
+                    className="px-2 py-1 bg-secondary text-xs rounded-full text-muted-foreground"
+                  >
+                    {app}
+                  </span>
+                ))}
+              </div>
+
+              <Button 
+                onClick={handleConfirm} 
+                className="w-full" 
+                size="lg"
+              >
+                <CheckCircle2 className="w-4 h-4 mr-2" />
+                Konfirmasi Pembayaran Diterima
+              </Button>
+            </div>
           )}
 
           {/* Step: Cash Payment */}
