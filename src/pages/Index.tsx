@@ -12,6 +12,7 @@ import { Dashboard } from "@/components/Dashboard";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { PaymentMethodSelector } from "@/components/PaymentMethodSelector";
 import { Receipt } from "@/components/Receipt";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { CartItem } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
 import { useProducts } from "@/hooks/useProducts";
@@ -188,17 +189,20 @@ const Index = () => {
               </p>
             </div>
           </div>
-          {!isInstalled && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate("/install")}
-              className="gap-2"
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">Install App</span>
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            {!isInstalled && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/install")}
+                className="gap-2"
+              >
+                <Download className="w-4 h-4" />
+                <span className="hidden sm:inline">Install App</span>
+              </Button>
+            )}
+          </div>
         </div>
 
         <Tabs defaultValue="pos" className="space-y-4 sm:space-y-6">
