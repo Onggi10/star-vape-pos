@@ -13,6 +13,7 @@ import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { PaymentMethodSelector } from "@/components/PaymentMethodSelector";
 import { Receipt } from "@/components/Receipt";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { PrinterStatus } from "@/components/PrinterStatus";
 import { CartItem } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
 import { useProducts } from "@/hooks/useProducts";
@@ -190,6 +191,7 @@ const Index = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <PrinterStatus />
             <ThemeToggle />
             {!isInstalled && (
               <Button
