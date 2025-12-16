@@ -1,5 +1,5 @@
 /// <reference path="../types/web-bluetooth.d.ts" />
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useRef, ReactNode } from "react";
 import { CartItem } from "@/types/product";
 
 interface PrinterState {
@@ -51,6 +51,10 @@ export const ThermalPrinterProvider = ({ children }: { children: ReactNode }) =>
     error: null,
   });
 
+  // Use refs to maintain stable references across renders
+  const deviceRef = useRef<BluetoothDevice | null>(null);
+  const characteristicRef = useRef<BluetoothRemoteGATTCharacteristic | null>(null);
+
   const writeData = async (characteristic: BluetoothRemoteGATTCharacteristic | null, data: number[]) => {
     if (!characteristic) return false;
 
@@ -77,10 +81,64 @@ export const ThermalPrinterProvider = ({ children }: { children: ReactNode }) =>
     await writeData(characteristic, [...textToBytes(text), ...COMMANDS.FEED_LINE]);
   };
 
-  const connect = useCallback(async () => {
-    // If already connected, return true
-    if (state.isConnected && state.characteristic && state.device?.gatt?.connected) {
+  // Reconnect to existing device without prompting user
+  const reconnectToDevice = useCallback(async (device: BluetoothDevice): Promise<boolean> => {
+    try {
+      if (!device.gatt) {
+        console.log("GATT not available on device");
+        return false;
+      }
+
+      console.log("Attempting to reconnect to:", device.name);
+      const server = await device.gatt.connect();
+      const services = await server.getPrimaryServices();
+
+      let characteristic: BluetoothRemoteGATTCharacteristic | null = null;
+
+      for (const service of services) {
+        const characteristics = await service.getCharacteristics();
+        for (const char of characteristics) {
+          if (char.properties.write || char.properties.writeWithoutResponse) {
+            characteristic = char;
+            break;
+          }
+        }
+        if (characteristic) break;
+      }
+
+      if (!characteristic) {
+        console.log("Writable characteristic not found during reconnect");
+        return false;
+      }
+
+      characteristicRef.current = characteristic;
+      setState(prev => ({
+        ...prev,
+        characteristic,
+        isConnected: true,
+        error: null,
+      }));
+
+      console.log("Successfully reconnected to printer");
       return true;
+    } catch (error) {
+      console.error("Reconnection failed:", error);
+      return false;
+    }
+  }, []);
+
+  const connect = useCallback(async () => {
+    // If already connected and GATT is still connected, return true
+    if (deviceRef.current?.gatt?.connected && characteristicRef.current) {
+      console.log("Already connected to printer");
+      return true;
+    }
+
+    // Try to reconnect if we have a device but lost connection
+    if (deviceRef.current && !deviceRef.current.gatt?.connected) {
+      console.log("Device exists but disconnected, attempting reconnect...");
+      const reconnected = await reconnectToDevice(deviceRef.current);
+      if (reconnected) return true;
     }
 
     if (!navigator.bluetooth) {
@@ -127,12 +185,18 @@ export const ThermalPrinterProvider = ({ children }: { children: ReactNode }) =>
         throw new Error("Karakteristik tulis tidak ditemukan");
       }
 
+      // Store in refs for persistence
+      deviceRef.current = device;
+      characteristicRef.current = characteristic;
+
       device.addEventListener("gattserverdisconnected", () => {
+        console.log("Printer disconnected, keeping device reference for reconnection");
+        characteristicRef.current = null;
         setState((prev) => ({
           ...prev,
           isConnected: false,
-          device: null,
           characteristic: null,
+          // Keep device reference for reconnection
         }));
       });
 
@@ -144,6 +208,7 @@ export const ThermalPrinterProvider = ({ children }: { children: ReactNode }) =>
         error: null,
       });
 
+      console.log("Connected to printer:", device.name);
       return true;
     } catch (error) {
       const message =
@@ -155,12 +220,14 @@ export const ThermalPrinterProvider = ({ children }: { children: ReactNode }) =>
       }));
       return false;
     }
-  }, [state.isConnected, state.characteristic, state.device]);
+  }, [reconnectToDevice]);
 
   const disconnect = useCallback(async () => {
-    if (state.device?.gatt?.connected) {
-      state.device.gatt.disconnect();
+    if (deviceRef.current?.gatt?.connected) {
+      deviceRef.current.gatt.disconnect();
     }
+    deviceRef.current = null;
+    characteristicRef.current = null;
     setState({
       device: null,
       characteristic: null,
@@ -168,7 +235,8 @@ export const ThermalPrinterProvider = ({ children }: { children: ReactNode }) =>
       isConnecting: false,
       error: null,
     });
-  }, [state.device]);
+    console.log("Disconnected from printer");
+  }, []);
 
   const printReceipt = useCallback(
     async (
@@ -177,7 +245,19 @@ export const ThermalPrinterProvider = ({ children }: { children: ReactNode }) =>
       transactionId: string,
       paymentMethod: string
     ) => {
-      const characteristic = state.characteristic;
+      // Try to reconnect if we have a device but lost connection
+      if (deviceRef.current && !deviceRef.current.gatt?.connected) {
+        console.log("Connection lost, attempting auto-reconnect before printing...");
+        setState(prev => ({ ...prev, isConnecting: true }));
+        const reconnected = await reconnectToDevice(deviceRef.current);
+        setState(prev => ({ ...prev, isConnecting: false }));
+        if (!reconnected) {
+          setState((prev) => ({ ...prev, error: "Gagal reconnect ke printer. Silakan hubungkan ulang." }));
+          return false;
+        }
+      }
+
+      const characteristic = characteristicRef.current;
       
       if (!characteristic) {
         setState((prev) => ({ ...prev, error: "Printer tidak terhubung" }));
@@ -278,7 +358,7 @@ export const ThermalPrinterProvider = ({ children }: { children: ReactNode }) =>
         return false;
       }
     },
-    [state.characteristic]
+    [reconnectToDevice]
   );
 
   return (
