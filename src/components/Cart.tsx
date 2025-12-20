@@ -10,9 +10,10 @@ interface CartProps {
   onUpdateQuantity: (id: string, quantity: number) => void;
   onRemoveItem: (id: string) => void;
   onCheckout: () => void;
+  disabled?: boolean;
 }
 
-export const Cart = ({ items, onUpdateQuantity, onRemoveItem, onCheckout }: CartProps) => {
+export const Cart = ({ items, onUpdateQuantity, onRemoveItem, onCheckout, disabled }: CartProps) => {
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -97,9 +98,9 @@ export const Cart = ({ items, onUpdateQuantity, onRemoveItem, onCheckout }: Cart
           className="w-full"
           size="default"
           onClick={onCheckout}
-          disabled={items.length === 0}
+          disabled={items.length === 0 || disabled}
         >
-          Checkout
+          {disabled ? "Buka Shift Dulu" : "Checkout"}
         </Button>
       </div>
     </Card>

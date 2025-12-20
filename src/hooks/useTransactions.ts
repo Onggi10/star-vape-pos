@@ -19,6 +19,7 @@ export interface Transaction {
   total: number;
   payment_method: string;
   created_at: string;
+  shift_id?: string | null;
   items?: TransactionItem[];
 }
 
@@ -63,7 +64,8 @@ export const useTransactions = () => {
   const createTransaction = async (
     items: CartItem[],
     total: number,
-    paymentMethod: string
+    paymentMethod: string,
+    shiftId?: string | null
   ) => {
     try {
       const transactionNumber = `TRX${Date.now()}`;
@@ -76,6 +78,7 @@ export const useTransactions = () => {
             transaction_number: transactionNumber,
             total,
             payment_method: paymentMethod,
+            shift_id: shiftId || null,
           },
         ])
         .select()

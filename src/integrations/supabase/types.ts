@@ -50,6 +50,48 @@ export type Database = {
         }
         Relationships: []
       }
+      shifts: {
+        Row: {
+          closed_at: string | null
+          closing_cash: number | null
+          created_at: string
+          expected_cash: number | null
+          id: string
+          notes: string | null
+          opened_at: string
+          opening_cash: number
+          status: string
+          total_sales: number | null
+          total_transactions: number | null
+        }
+        Insert: {
+          closed_at?: string | null
+          closing_cash?: number | null
+          created_at?: string
+          expected_cash?: number | null
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          opening_cash?: number
+          status?: string
+          total_sales?: number | null
+          total_transactions?: number | null
+        }
+        Update: {
+          closed_at?: string | null
+          closing_cash?: number | null
+          created_at?: string
+          expected_cash?: number | null
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          opening_cash?: number
+          status?: string
+          total_sales?: number | null
+          total_transactions?: number | null
+        }
+        Relationships: []
+      }
       transaction_items: {
         Row: {
           created_at: string | null
@@ -103,6 +145,7 @@ export type Database = {
           created_at: string | null
           id: string
           payment_method: string
+          shift_id: string | null
           total: number
           transaction_number: string
         }
@@ -110,6 +153,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           payment_method: string
+          shift_id?: string | null
           total: number
           transaction_number: string
         }
@@ -117,10 +161,19 @@ export type Database = {
           created_at?: string | null
           id?: string
           payment_method?: string
+          shift_id?: string | null
           total?: number
           transaction_number?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "transactions_shift_id_fkey"
+            columns: ["shift_id"]
+            isOneToOne: false
+            referencedRelation: "shifts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
