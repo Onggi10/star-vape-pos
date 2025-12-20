@@ -14,16 +14,20 @@ import { PaymentMethodSelector } from "@/components/PaymentMethodSelector";
 import { Receipt } from "@/components/Receipt";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PrinterStatus } from "@/components/PrinterStatus";
+import { ShiftManager } from "@/components/ShiftManager";
 import { CartItem } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
 import { useProducts } from "@/hooks/useProducts";
-import { useTransactions } from "@/hooks/useTransactions";
+import { useTransactions, Transaction } from "@/hooks/useTransactions";
+import { useShifts } from "@/hooks/useShifts";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { products, loading } = useProducts();
-  const { createTransaction } = useTransactions();
+  const { createTransaction, transactions } = useTransactions();
+  const { currentShift, openShift, closeShift } = useShifts();
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -112,6 +116,14 @@ const Index = () => {
 
   const handleCheckoutClick = () => {
     if (cart.length === 0) return;
+    if (!currentShift) {
+      toast({
+        title: "Shift Belum Dibuka",
+        description: "Buka shift terlebih dahulu sebelum melakukan transaksi",
+        variant: "destructive",
+      });
+      return;
+    }
     setShowPaymentDialog(true);
   };
 
@@ -120,7 +132,7 @@ const Index = () => {
 
     try {
       const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const transaction = await createTransaction(cart, total, paymentMethod);
+      const transaction = await createTransaction(cart, total, paymentMethod, currentShift?.id);
 
       setCurrentTransaction({
         items: cart,
@@ -135,6 +147,22 @@ const Index = () => {
       console.error("Transaction error:", error);
     }
   };
+
+  // Calculate shift summary from transactions in current shift
+  const shiftSummary = currentShift
+    ? {
+        totalSales: transactions
+          .filter((t) => t.shift_id === currentShift.id)
+          .reduce((sum, t) => sum + Number(t.total), 0),
+        cashSales: transactions
+          .filter((t) => t.shift_id === currentShift.id && t.payment_method === "cash")
+          .reduce((sum, t) => sum + Number(t.total), 0),
+        qrisSales: transactions
+          .filter((t) => t.shift_id === currentShift.id && t.payment_method === "qris")
+          .reduce((sum, t) => sum + Number(t.total), 0),
+        transactionCount: transactions.filter((t) => t.shift_id === currentShift.id).length,
+      }
+    : undefined;
 
   const handlePrintComplete = () => {
     setShowReceipt(false);
@@ -230,13 +258,20 @@ const Index = () => {
           {/* TAB POS */}
           <TabsContent value="pos" className="space-y-4 sm:space-y-6">
             <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-6">
-              {/* Cart - Mobile: Tampil di atas */}
-              <div className="lg:hidden">
+              {/* Shift Manager & Cart - Mobile: Tampil di atas */}
+              <div className="lg:hidden space-y-4">
+                <ShiftManager
+                  currentShift={currentShift}
+                  onOpenShift={openShift}
+                  onCloseShift={closeShift}
+                  shiftSummary={shiftSummary}
+                />
                 <Cart
                   items={cart}
                   onUpdateQuantity={handleUpdateQuantity}
                   onRemoveItem={handleRemoveItem}
                   onCheckout={handleCheckoutClick}
+                  disabled={!currentShift}
                 />
               </div>
 
@@ -253,6 +288,15 @@ const Index = () => {
                   </div>
                   <BarcodeScanner onScan={handleBarcodeScanned} />
                 </div>
+
+                {!currentShift && (
+                  <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
+                    <p className="text-destructive font-medium">Shift belum dibuka</p>
+                    <p className="text-sm text-muted-foreground">
+                      Buka shift terlebih dahulu untuk memulai transaksi
+                    </p>
+                  </div>
+                )}
 
                 {loading ? (
                   <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-2 sm:gap-4">
@@ -275,14 +319,21 @@ const Index = () => {
                 )}
               </div>
 
-              {/* Cart - Desktop: Tampil di samping */}
+              {/* Shift Manager & Cart - Desktop: Tampil di samping */}
               <div className="hidden lg:block lg:col-span-1">
-                <div className="sticky top-6">
+                <div className="sticky top-6 space-y-4">
+                  <ShiftManager
+                    currentShift={currentShift}
+                    onOpenShift={openShift}
+                    onCloseShift={closeShift}
+                    shiftSummary={shiftSummary}
+                  />
                   <Cart
                     items={cart}
                     onUpdateQuantity={handleUpdateQuantity}
                     onRemoveItem={handleRemoveItem}
                     onCheckout={handleCheckoutClick}
+                    disabled={!currentShift}
                   />
                 </div>
               </div>
