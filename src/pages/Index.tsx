@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ShoppingBag, Package, History, BarChart3, Download } from "lucide-react";
+import { Search, ShoppingBag, Package, History, BarChart3, Download, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ProductCard } from "@/components/ProductCard";
 import { Cart } from "@/components/Cart";
 import { InventoryManager } from "@/components/InventoryManager";
 import { TransactionHistory } from "@/components/TransactionHistory";
 import { Dashboard } from "@/components/Dashboard";
+import { DailyReport } from "@/components/DailyReport";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { PaymentMethodSelector } from "@/components/PaymentMethodSelector";
 import { Receipt } from "@/components/Receipt";
@@ -238,7 +239,7 @@ const Index = () => {
         </div>
 
         <Tabs defaultValue="pos" className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-4 h-auto p-1 gap-1">
+          <TabsList className="grid w-full grid-cols-5 h-auto p-1 gap-1">
             <TabsTrigger value="pos" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
               <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>Kasir</span>
@@ -250,6 +251,10 @@ const Index = () => {
             <TabsTrigger value="history" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
               <History className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>Riwayat</span>
+            </TabsTrigger>
+            <TabsTrigger value="report" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
+              <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>Laporan</span>
             </TabsTrigger>
             <TabsTrigger value="dashboard" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
               <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -348,6 +353,10 @@ const Index = () => {
 
           <TabsContent value="history">
             <TransactionHistory />
+          </TabsContent>
+
+          <TabsContent value="report">
+            <DailyReport />
           </TabsContent>
 
           <TabsContent value="dashboard">
