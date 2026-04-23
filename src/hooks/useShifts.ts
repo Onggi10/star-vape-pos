@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export interface Shift {
   id: string;
+  user_id: string | null;
   opened_at: string;
   closed_at: string | null;
   opening_cash: number;
@@ -14,6 +15,7 @@ export interface Shift {
   notes: string | null;
   status: "open" | "closed";
   created_at: string;
+  cashier_name?: string | null;
 }
 
 export const useShifts = () => {
@@ -73,12 +75,19 @@ export const useShifts = () => {
         return null;
       }
 
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({ title: "Error", description: "Anda harus login terlebih dahulu.", variant: "destructive" });
+        return null;
+      }
+
       const { data, error } = await supabase
         .from("shifts")
         .insert([
           {
             opening_cash: openingCash,
             status: "open",
+            user_id: user.id,
           },
         ])
         .select()

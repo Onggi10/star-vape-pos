@@ -15,6 +15,7 @@ import { Receipt } from "@/components/Receipt";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PrinterStatus } from "@/components/PrinterStatus";
 import { ShiftManager } from "@/components/ShiftManager";
+import { UserMenu } from "@/components/UserMenu";
 import { CartItem } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
 import { useProducts } from "@/hooks/useProducts";
@@ -221,6 +222,7 @@ const Index = () => {
           <div className="flex items-center gap-2">
             <PrinterStatus />
             <ThemeToggle />
+            <UserMenu />
             {!isInstalled && (
               <Button
                 variant="outline"
