@@ -51,6 +51,7 @@ const Index = () => {
     total: number;
     id: string;
     paymentMethod: string;
+    customer: { name: string; phone: string } | null;
   } | null>(null);
 
   const filteredProducts = products.filter(
@@ -132,18 +133,19 @@ const Index = () => {
     setShowPaymentDialog(true);
   };
 
-  const handlePaymentConfirm = async (paymentMethod: string) => {
+  const handlePaymentConfirm = async (paymentMethod: string, customer: { id: string; name: string; phone: string } | null) => {
     if (cart.length === 0) return;
 
     try {
       const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const transaction = await createTransaction(cart, total, paymentMethod, currentShift?.id);
+      const transaction = await createTransaction(cart, total, paymentMethod, currentShift?.id, customer?.id ?? null);
 
       setCurrentTransaction({
         items: cart,
         total,
         id: transaction.transaction_number,
         paymentMethod,
+        customer: customer ? { name: customer.name, phone: customer.phone } : null,
       });
 
       setShowReceipt(true);
@@ -196,6 +198,7 @@ const Index = () => {
           total={currentTransaction.total}
           transactionId={currentTransaction.id}
           paymentMethod={currentTransaction.paymentMethod}
+          customer={currentTransaction.customer}
           onPrintComplete={handlePrintComplete}
         />
       )}
