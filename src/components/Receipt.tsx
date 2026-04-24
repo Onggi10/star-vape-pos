@@ -189,17 +189,6 @@ export const Receipt = ({
           </Button>
         )}
 
-        {isConnected && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={disconnect}
-            className="text-muted-foreground"
-          >
-            Putus
-          </Button>
-        )}
-
         <Button
           variant="default"
           size="sm"
