@@ -65,7 +65,8 @@ export const useTransactions = () => {
     items: CartItem[],
     total: number,
     paymentMethod: string,
-    shiftId?: string | null
+    shiftId?: string | null,
+    customerId?: string | null
   ) => {
     try {
       const transactionNumber = `TRX${Date.now()}`;
@@ -79,6 +80,7 @@ export const useTransactions = () => {
             total,
             payment_method: paymentMethod,
             shift_id: shiftId || null,
+            customer_id: customerId || null,
           },
         ])
         .select()
