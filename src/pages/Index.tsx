@@ -356,21 +356,27 @@ const Index = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="inventory">
-            <InventoryManager />
-          </TabsContent>
+          {isAdmin && (
+            <TabsContent value="inventory">
+              <InventoryManager />
+            </TabsContent>
+          )}
 
           <TabsContent value="history">
             <TransactionHistory />
           </TabsContent>
 
-          <TabsContent value="report">
-            <DailyReport />
-          </TabsContent>
+          {isAdmin && (
+            <>
+              <TabsContent value="report">
+                <DailyReport />
+              </TabsContent>
 
-          <TabsContent value="dashboard">
-            <Dashboard />
-          </TabsContent>
+              <TabsContent value="dashboard">
+                <Dashboard />
+              </TabsContent>
+            </>
+          )}
         </Tabs>
       </div>
     </div>
