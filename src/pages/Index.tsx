@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useProducts } from "@/hooks/useProducts";
 import { useTransactions, Transaction } from "@/hooks/useTransactions";
 import { useShifts } from "@/hooks/useShifts";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
@@ -30,6 +31,8 @@ const Index = () => {
   const { products, loading } = useProducts();
   const { createTransaction, transactions } = useTransactions();
   const { currentShift, openShift, closeShift } = useShifts();
+  const { role } = useAuth();
+  const isAdmin = role === "admin";
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
