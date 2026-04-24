@@ -11,6 +11,9 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import AdminCashiers from "./pages/AdminCashiers";
+import AdminInventory from "./pages/AdminInventory";
+import AdminReport from "./pages/AdminReport";
+import AdminDashboard from "./pages/AdminDashboard";
 import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
 
@@ -31,6 +34,9 @@ const App = () => (
                 <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/admin/cashiers" element={<ProtectedRoute requireRole="admin"><AdminCashiers /></ProtectedRoute>} />
+                <Route path="/stok" element={<ProtectedRoute requireRole="admin"><AdminInventory /></ProtectedRoute>} />
+                <Route path="/laporan" element={<ProtectedRoute requireRole="admin"><AdminReport /></ProtectedRoute>} />
+                <Route path="/dashboard" element={<ProtectedRoute requireRole="admin"><AdminDashboard /></ProtectedRoute>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

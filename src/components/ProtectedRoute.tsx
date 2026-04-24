@@ -19,7 +19,10 @@ export const ProtectedRoute = ({ children, requireRole }: Props) => {
   }
 
   if (!user) return <Navigate to="/auth" replace />;
-  if (requireRole && role !== requireRole) return <Navigate to="/" replace />;
+  if (requireRole && role !== requireRole) {
+    // Cashier yang mencoba akses halaman admin dialihkan ke beranda kasir
+    return <Navigate to="/" replace />;
+  }
 
   return <>{children}</>;
 };
