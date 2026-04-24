@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      customers: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          phone: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          phone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           barcode: string | null
@@ -176,6 +200,7 @@ export type Database = {
       transactions: {
         Row: {
           created_at: string | null
+          customer_id: string | null
           id: string
           payment_method: string
           shift_id: string | null
@@ -184,6 +209,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          customer_id?: string | null
           id?: string
           payment_method: string
           shift_id?: string | null
@@ -192,6 +218,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          customer_id?: string | null
           id?: string
           payment_method?: string
           shift_id?: string | null
@@ -199,6 +226,13 @@ export type Database = {
           transaction_number?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "transactions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "transactions_shift_id_fkey"
             columns: ["shift_id"]
