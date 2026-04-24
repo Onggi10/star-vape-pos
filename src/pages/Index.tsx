@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useProducts } from "@/hooks/useProducts";
 import { useTransactions, Transaction } from "@/hooks/useTransactions";
 import { useShifts } from "@/hooks/useShifts";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
@@ -30,6 +31,8 @@ const Index = () => {
   const { products, loading } = useProducts();
   const { createTransaction, transactions } = useTransactions();
   const { currentShift, openShift, closeShift } = useShifts();
+  const { role } = useAuth();
+  const isAdmin = role === "admin";
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -239,27 +242,33 @@ const Index = () => {
         </div>
 
         <Tabs defaultValue="pos" className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-5 h-auto p-1 gap-1">
+          <TabsList className={`grid w-full ${isAdmin ? "grid-cols-5" : "grid-cols-2"} h-auto p-1 gap-1`}>
             <TabsTrigger value="pos" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
               <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>Kasir</span>
             </TabsTrigger>
-            <TabsTrigger value="inventory" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
-              <Package className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span>Stok</span>
-            </TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger value="inventory" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
+                <Package className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Stok</span>
+              </TabsTrigger>
+            )}
             <TabsTrigger value="history" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
               <History className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>Riwayat</span>
             </TabsTrigger>
-            <TabsTrigger value="report" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
-              <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span>Laporan</span>
-            </TabsTrigger>
-            <TabsTrigger value="dashboard" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
-              <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span>Dashboard</span>
-            </TabsTrigger>
+            {isAdmin && (
+              <>
+                <TabsTrigger value="report" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
+                  <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>Laporan</span>
+                </TabsTrigger>
+                <TabsTrigger value="dashboard" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
+                  <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>Dashboard</span>
+                </TabsTrigger>
+              </>
+            )}
           </TabsList>
 
           {/* TAB POS */}
@@ -347,21 +356,27 @@ const Index = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="inventory">
-            <InventoryManager />
-          </TabsContent>
+          {isAdmin && (
+            <TabsContent value="inventory">
+              <InventoryManager />
+            </TabsContent>
+          )}
 
           <TabsContent value="history">
             <TransactionHistory />
           </TabsContent>
 
-          <TabsContent value="report">
-            <DailyReport />
-          </TabsContent>
+          {isAdmin && (
+            <>
+              <TabsContent value="report">
+                <DailyReport />
+              </TabsContent>
 
-          <TabsContent value="dashboard">
-            <Dashboard />
-          </TabsContent>
+              <TabsContent value="dashboard">
+                <Dashboard />
+              </TabsContent>
+            </>
+          )}
         </Tabs>
       </div>
     </div>
