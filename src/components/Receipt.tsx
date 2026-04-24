@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CartItem } from "@/types/product";
 import { Button } from "@/components/ui/button";
-import { Printer, Bluetooth, X } from "lucide-react";
+import { Printer, Bluetooth, X, MessageCircle, Loader2 } from "lucide-react";
 import { useThermalPrinterContext } from "@/contexts/ThermalPrinterContext";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import html2canvas from "html2canvas";
 import "@/styles/print.css";
 
 interface ReceiptProps {
@@ -11,6 +13,7 @@ interface ReceiptProps {
   total: number;
   transactionId: string;
   paymentMethod: string;
+  customer?: { name: string; phone: string } | null;
   onPrintComplete: () => void;
 }
 
@@ -19,9 +22,12 @@ export const Receipt = ({
   total,
   transactionId,
   paymentMethod,
+  customer,
   onPrintComplete,
 }: ReceiptProps) => {
   const { toast } = useToast();
+  const receiptRef = useRef<HTMLDivElement>(null);
+  const [sendingWa, setSendingWa] = useState(false);
   const {
     isConnected,
     isConnecting,
