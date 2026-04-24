@@ -11,11 +11,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Wallet, CreditCard, Smartphone, Building2, ArrowLeft, Calculator, CheckCircle2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
+import { CustomerSelector } from "@/components/CustomerSelector";
+import { Customer } from "@/hooks/useCustomers";
 
 interface PaymentMethodSelectorProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (method: string) => void;
+  onConfirm: (method: string, customer: Customer | null) => void;
   total: number;
 }
 
@@ -42,6 +44,7 @@ export const PaymentMethodSelector = ({
   const [step, setStep] = useState<"method" | "cash" | "transfer" | "qris">("method");
   const [cashReceived, setCashReceived] = useState<number>(0);
   const [selectedBank, setSelectedBank] = useState("bca");
+  const [customer, setCustomer] = useState<Customer | null>(null);
 
   const paymentMethods = [
     { value: "cash", label: "Cash", icon: Wallet },
@@ -71,9 +74,9 @@ export const PaymentMethodSelector = ({
 
   const handleConfirm = () => {
     if (selectedMethod === "transfer") {
-      onConfirm(`Transfer ${banks.find(b => b.value === selectedBank)?.label}`);
+      onConfirm(`Transfer ${banks.find(b => b.value === selectedBank)?.label}`, customer);
     } else {
-      onConfirm(selectedMethod);
+      onConfirm(selectedMethod, customer);
     }
     handleClose();
   };
@@ -82,6 +85,7 @@ export const PaymentMethodSelector = ({
     setStep("method");
     setCashReceived(0);
     setSelectedMethod("cash");
+    setCustomer(null);
     onClose();
   };
 
@@ -126,6 +130,11 @@ export const PaymentMethodSelector = ({
               Rp {total.toLocaleString("id-ID")}
             </p>
           </div>
+
+          {/* Customer Selector - tampil di step method */}
+          {step === "method" && (
+            <CustomerSelector selected={customer} onChange={setCustomer} />
+          )}
 
           {/* Step: Method Selection */}
           {step === "method" && (
